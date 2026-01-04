@@ -10,6 +10,11 @@ import LLMNode from './nodes/llmNode';
 import { InputNode } from './nodes/inputNode';
 import { OutputNode } from './nodes/outputNode';
 import { TextNode } from './nodes/textNode';
+import { NumberNode } from './nodes/numberNode';
+import { BooleanNode } from './nodes/booleanNode';
+import { MathNode } from './nodes/mathNode';
+import { ApiNode } from './nodes/apiNode';
+import { DelayNode } from './nodes/delayNode';
 
 
 
@@ -22,6 +27,11 @@ const nodeTypes = {
   llm: LLMNode,
   customOutput: OutputNode,
   text: TextNode,
+  number: NumberNode,
+  boolean: BooleanNode,
+  math: MathNode,
+  api: ApiNode,
+  delay: DelayNode,
 };
 
 const selector = (state) => ({
@@ -32,6 +42,7 @@ const selector = (state) => ({
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
   onConnect: state.onConnect,
+  updateNodeField: state.updateNodeField,
 });
 
 export const PipelineUI = () => {
@@ -44,13 +55,14 @@ export const PipelineUI = () => {
       addNode,
       onNodesChange,
       onEdgesChange,
-      onConnect
+      onConnect,
+      updateNodeField,
     } = useStore(selector, shallow);
 
-    const getInitNodeData = (nodeID, type) => {
+    const getInitNodeData = useCallback((nodeID, type) => {
       let nodeData = { id: nodeID, nodeType: `${type}` };
-      return nodeData;
-    }
+      return { ...nodeData, onChange: (fieldName, fieldValue) => updateNodeField(nodeID, fieldName, fieldValue) };
+    }, [updateNodeField]);
 
     const onDrop = useCallback(
         (event) => {
@@ -82,7 +94,7 @@ export const PipelineUI = () => {
             addNode(newNode);
           }
         },
-        [reactFlowInstance]
+        [reactFlowInstance, getNodeID, addNode, getInitNodeData]
     );
 
     const onDragOver = useCallback((event) => {
@@ -92,7 +104,7 @@ export const PipelineUI = () => {
 
     return (
         <>
-        <div ref={reactFlowWrapper} style={{width: '100wv', height: '70vh'}}>
+        <div ref={reactFlowWrapper} style={{width: '100%', height: '100%'}}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -106,6 +118,7 @@ export const PipelineUI = () => {
                 proOptions={proOptions}
                 snapGrid={[gridSize, gridSize]}
                 connectionLineType='smoothstep'
+                deleteKeyCode="Delete"
             >
                 <Background color="#aaa" gap={gridSize} />
                 <Controls />

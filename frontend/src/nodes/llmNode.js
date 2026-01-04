@@ -1,10 +1,15 @@
-import BaseNode from "./BaseNode";
+import GenericNode from './GenericNode';
 
 function LLMNode() {
   return (
-    <BaseNode title="LLM Node">
+    <GenericNode
+      title="LLM Node"
+      className="llm-node"
+      inputHandles={[{ id: 'input' }]}
+      outputHandles={[{ id: 'output' }]}
+    >
       <p>Large Language Model</p>
-    </BaseNode>
+    </GenericNode>
   );
 }
 

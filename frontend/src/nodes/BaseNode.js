@@ -1,6 +1,6 @@
-function BaseNode({ title, children }) {
+function BaseNode({ title, children, className = '' }) {
   return (
-    <div style={{ border: "1px solid black", padding: 10 }}>
+    <div className={`node ${className}`}>
       <h4>{title}</h4>
       {children}
     </div>

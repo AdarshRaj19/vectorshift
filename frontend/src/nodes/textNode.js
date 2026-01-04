@@ -1,21 +1,49 @@
-import { Handle, Position } from 'reactflow';
-import { useState } from 'react';
+import { useMemo } from 'react';
+import GenericNode from './GenericNode';
+import { useStore } from '../store';
 
-export function TextNode() {
-  const [template, setTemplate] = useState('');
+export function TextNode({ id, data }) {
+  const updateNodeField = useStore((s) => s.updateNodeField);
+  const template = data.template || '';
+
+  const variables = useMemo(() => {
+    const matches = template.match(/\{\{\s*(\w+)\s*\}\}/g);
+    if (!matches) return [];
+    return [...new Set(matches.map(m => m.match(/\{\{\s*(\w+)\s*\}\}/)[1]))];
+  }, [template]);
+
+  const variableHandles = variables.map((variable, index) => ({
+    id: variable,
+    top: 40 + index * 20
+  }));
+
+  const inputHandles = [
+    { id: 'text-input', top: 20 },
+    ...variableHandles
+  ];
 
   return (
-    <div style={{ border: '1px solid black', padding: 10 }}>
-      <h4>Text Node</h4>
-
+    <GenericNode
+      title="Text Node"
+      className="text-node"
+      inputHandles={inputHandles}
+      outputHandles={[{ id: 'output' }]}
+      style={{
+        minWidth: Math.max(150, template.length * 8),
+        minHeight: Math.max(100, template.split('\n').length * 20 + 60)
+      }}
+    >
       <textarea
-        placeholder="Hello {{name}}"
+        placeholder="Hello {{input}}"
         value={template}
-        onChange={(e) => setTemplate(e.target.value)}
+        onChange={(e) => updateNodeField(id, 'template', e.target.value)}
+        style={{
+          width: '100%',
+          height: 'auto',
+          minHeight: '40px',
+          resize: 'none'
+        }}
       />
-
-      <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Right} />
-    </div>
+    </GenericNode>
   );
 }

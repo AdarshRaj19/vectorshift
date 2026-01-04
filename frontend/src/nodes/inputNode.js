@@ -1,19 +1,19 @@
-import { Handle, Position } from 'reactflow';
+import GenericNode from './GenericNode';
 
 export function InputNode({ id, data }) {
   return (
-    <div style={{ border: '1px solid black', padding: 10 }}>
-      <h4>Input Node</h4>
-
+    <GenericNode
+      title="Input Node"
+      className="input-node"
+      outputHandles={[{ id: 'output' }]}
+    >
       <input
         placeholder="Enter value"
         value={data.value || ''}
         onChange={(e) => {
-          data.onChange(id, e.target.value);
+          data.onChange('value', e.target.value);
         }}
       />
-
-      <Handle type="source" position={Position.Right} />
-    </div>
+    </GenericNode>
   );
 }
